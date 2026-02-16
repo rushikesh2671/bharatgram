@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BharatGram</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #fafafa;
+        }
+
+        .center {
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px;
+            width: 200px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background: #3897f0;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header img {
+            width: 120px;
+        }
+
+        .profile {
+            text-align: center;
+            padding: 15px;
+            background: white;
+        }
+
+        .profile img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        .upload {
+            text-align: center;
+            padding: 10px;
+            background: white;
+        }
+
+        .posts {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            padding: 4px;
+        }
+
+        .posts img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 10px;
+            max-width: 400px;
+        }
+
+        .popup img {
+            width: 100%;
+        }
+
+        .like {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="center">
+    <img src="logo.png" width="150"><br><br>
+    <input type="text" id="username" placeholder="Username"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+</div>
+
+<!-- APP -->
+<div id="appPage" class="hidden">
+
+    <div class="header">
+        <img src="logo.png">
+        <div>
+            <span id="userDisplay"></span>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="profile">
+        <img src="profile.jpg">
+        <h3 id="profileName">User</h3>
+        <p>Indian Creator 🇮🇳</p>
+    </div>
+
+    <div class="upload">
+        <input type="file" id="fileInput">
+        <button onclick="addPost()">Upload Post</button>
+    </div>
+
+    <div class="posts" id="posts">
+        <img src="https://picsum.photos/400?1" onclick="openPost(this)">
+        <img src="https://picsum.photos/400?2" onclick="openPost(this)">
+        <img src="https://picsum.photos/400?3" onclick="openPost(this)">
+    </div>
+
+</div>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+    <div class="popup-content">
+        <img id="popup-img">
+        <p><b id="popupUser">User</b> Post</p>
+        <span class="like" onclick="toggleLike(this)">🤍</span>
+    </div>
+</div>
+
+<script>
+function login() {
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+
+    if (user === "" || pass === "") {
+        alert("Enter details");
+        return;
+    }
+
+    localStorage.setItem("bg_user", user);
+
+    showApp(user);
+}
+
+function showApp(user) {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("appPage").style.display = "block";
+    document.getElementById("userDisplay").textContent = user;
+    document.getElementById("profileName").textContent = user;
+    document.getElementById("popupUser").textContent = user;
+}
+
+function logout() {
+    localStorage.removeItem("bg_user");
+    location.reload();
+}
+
+window.onload = function() {
+    const savedUser = localStorage.getItem("bg_user");
+    if (savedUser) showApp(savedUser);
+}
+
+function openPost(img) {
+    document.getElementById("popup").style.display = "flex";
+    document.getElementById("popup-img").src = img.src;
+}
+
+function toggleLike(el) {
+    el.textContent = el.textContent == "🤍" ? "❤️" : "🤍";
+}
+
+window.onclick = function(e) {
+    if (e.target.id === "popup") {
+        document.getElementById("popup").style.display = "none";
+    }
+}
+
+function addPost() {
+    const fileInput = document.getElementById("fileInput");
+    const posts = document.getElementById("posts");
+
+    if (fileInput.files.length === 0) {
+        alert("Select image");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.onclick = function() { openPost(img); };
+        posts.prepend(img);
+    };
+
+    reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>
